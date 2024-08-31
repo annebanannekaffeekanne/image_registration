@@ -1,8 +1,10 @@
 #import necessary libraries
 import numpy as np
+import cv2
 
 # ----------------------------------------------------------------------------------------------------
 ## create general transformation matrix
+## working method
 def transformation_matrix(tx, ty, sx, sy, a, shx, shy):
     # angle as radian
     a = np.radians(a)
@@ -28,6 +30,13 @@ def transformation_matrix(tx, ty, sx, sy, a, shx, shy):
     #print(transformation_matrix)
     return transformation_matrix
 
+def apply_transformations(image, transformation_matrix):
+    height, width = image.shape[:2]
+    transformed_image = cv2.warpAffine(image, transformation_matrix[:2], (width, height))
+
+    return transformed_image
+
+
 # ----------------------------------------------------------------------------------------------------
 ## decode float parameter into bitstring and reverse
 # decode a float parameter (e.g. tx) into a bitstring
@@ -49,22 +58,22 @@ def bitstring_to_parameter(bitstring, bits, lower_range_value, upper_range_value
 def individual_to_bitstring(tx, ty, sx, sy, a, shx, shy):
     tx_bits = parameter_to_bitstring(tx, 8, -20, 20)
     ty_bits = parameter_to_bitstring(ty, 8, -20, 20)
-    sx_bits = parameter_to_bitstring(sx, 8, 0.9, 1.5)
-    sy_bits = parameter_to_bitstring(sy, 8, 0.9, 1.5)
-    a_bits = parameter_to_bitstring(a, 8, -30, 30)
-    shx_bits = parameter_to_bitstring(shx, 8, -0.5, 0.5)
-    shy_bits = parameter_to_bitstring(shy, 8, -0.5, 0.5)
+    sx_bits = parameter_to_bitstring(sx, 8, 0.95, 1.10)
+    sy_bits = parameter_to_bitstring(sy, 8, 0.95, 1.10)
+    a_bits = parameter_to_bitstring(a, 8, -15, 15)
+    shx_bits = parameter_to_bitstring(shx, 8, -0.01, 0.01)
+    shy_bits = parameter_to_bitstring(shy, 8, -0.01, 0.01)
     return tx_bits + ty_bits + sx_bits + sy_bits + a_bits + shx_bits + shy_bits
 
 # apply bitstring_to_parameter and retransform every bitstring-individual into float-parameter
 def bitstring_to_individual(bitstring):
     tx = bitstring_to_parameter(bitstring[:8], 8, -20, 20)
     ty = bitstring_to_parameter(bitstring[8:16], 8, -20, 20)
-    sx = bitstring_to_parameter(bitstring[16:24], 8, 0.9, 1.5)
-    sy = bitstring_to_parameter(bitstring[24:32], 8, 0.9, 1.5)
-    a = bitstring_to_parameter(bitstring[32:40], 8, -30, 30)
-    shx = bitstring_to_parameter(bitstring[40:48], 8, -0.5, 0.5)
-    shy = bitstring_to_parameter(bitstring[48:], 8, -0.5, 0.5)
+    sx = bitstring_to_parameter(bitstring[16:24], 8, 0.95, 1.10)
+    sy = bitstring_to_parameter(bitstring[24:32], 8, 0.95, 1.10)
+    a = bitstring_to_parameter(bitstring[32:40], 8, -15, 15)
+    shx = bitstring_to_parameter(bitstring[40:48], 8, -0.01, 0.01)
+    shy = bitstring_to_parameter(bitstring[48:], 8, -0.01, 0.01)
     return tx, ty, sx, sy, a, shx, shy
 
 # ------------------------------------------------------------------------------------------------------

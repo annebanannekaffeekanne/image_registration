@@ -6,26 +6,39 @@ from ._1_coding_decoding import transformation_matrix, individual_to_bitstring, 
 # -----------------------------------------------------------------------------------------------------
 ## initialize population as binary-, gray-coded-, decoded-bitstring and matrix
 def initialize_population(population_size):
+    # for lists to differentiate between the different populations
+    # as matrix
     population = []
+    # as binary bitstring
     population_as_bitstring = []
+    # as gray coded bitstring
     population_as_gray_coded_bitstring = []
+    # decoded (not necessary)
     population_decoded = []
 
+    # create a population which is made of individuals; as many as the population_size instructs
     for individual in range(population_size):
+        ## value ranges are adjustable
         # translation variables
-        tx, ty = random.randint(-1, 1), random.randint(-1, 1)
+        tx, ty = random.randint(-20, 20), random.randint(-20, 20)
         # scaling factors
-        sx, sy = random.uniform(0.99, 1.0), random.uniform(0.99, 1.0)
+        sx, sy = random.uniform(0.95, 1.10), random.uniform(0.95, 1.10)
         # rotation angle
-        a = random.uniform(-1, 1)
+        a = random.uniform(-15, 15)
         # shearing factors
-        shx, shy = random.uniform(-0.001, 0.001), random.uniform(-0.001, 0.001)
+        shx, shy = random.uniform(-0.01, 0.01), random.uniform(-0.01, 0.01)
 
+        # hand the selected transformation parameter over to the method where a transformation matrix is generated
         transformation = transformation_matrix(tx, ty, sx, sy, a, shx, shy)
+        # hand the selected transformation parameter over to the method where a bitstring is created
         binary_bitstring = individual_to_bitstring(tx, ty, sx, sy, a, shx, shy)
+
+        # create a gray coded bitstring thourough using to binary_to_gray method
         gray_coded_bitstring = binary_to_gray(binary_bitstring)
+        # decode bitstring (not necessary)
         decoded_bitstring = gray_to_binary(gray_coded_bitstring)
 
+        # create the different populations thourough adding the individuals (transformations) the the lists
         population.append(transformation)
         population_as_bitstring.append(binary_bitstring)
         population_as_gray_coded_bitstring.append(gray_coded_bitstring)

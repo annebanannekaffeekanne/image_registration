@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 
 # Definiere den Pfad zum Output-Verzeichnis und zum Verzeichnis für eingefärbte Bilder
-OUTPUT_DIR = '/Users/anne/PycharmProjects/genetic_algorithm/output_images'
+OUTPUT_DIR = '/output_data/output_images'
 COLORED_OUTPUT_DIR = '/Users/anne/PycharmProjects/genetic_algorithm/colored_images'
 
 

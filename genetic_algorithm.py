@@ -1,82 +1,55 @@
-## import necessary libraries
-#from algorithm_code.coding_decoding import individual_to_bitstring, bitstring_to_individual, bitstring_to_matrix
-from algorithm_code._3_initialize_population import initialize_population
-from algorithm_code._2_fitness_functions import NCC
-from algorithm_code._5_test_fitness_and_selection import test_fitness_and_select
-from algorithm_code._6_crossover_mutation import next_generation
+## import necessary libraries and methods
 from data_processing_code.load_preprocess_transform_images import load_images
-from data_processing_code.transformation_methods import apply_transformations
-from visualization_code.visualization_methods import save_images, create_output_dirs
+from visualization_code.visualization_methods import save_images, create_output_dirs, plot_patient_fitness_generations, plot_total_average_fitness_generations
+from algorithm_code._2_fitness_functions import NCC, NMI, MI, SSD
+from algorithm_code._3_initialize_population import initialize_population
+from algorithm_code._5_test_fitness_and_selection import test_fitness_and_select
+from algorithm_code._8_genetic_algorithm import genetic_algorithm, process_images_and_run_algorithm
 import cv2
 
+
 # ----------------------------------------------------------------------------------------------------------
-# define path
+## define paths
+# for the application on the whole directory
 DATA = '/Users/anne/PycharmProjects/genetic_algorithm/data/preprocessed_data'
-OUTPUT = '/Users/anne/PycharmProjects/genetic_algorithm/output_images'
+OUTPUT = '/Users/anne/PycharmProjects/genetic_algorithm/output_data/output_images'
+
+# for the application of the genetic algorithm on selected images
+ct_image_path = '/Users/anne/PycharmProjects/genetic_algorithm/data/slightly_transformed/p1/ct_image.png'
+pet_image_path = '/Users/anne/PycharmProjects/genetic_algorithm/data/slightly_transformed/p1/pet_image.png'
 
 # ----------------------------------------------------------------------------------------------------------
 ## declare variables
-population_size = 10
+population_size = 30
 mutation_rate = 0.01
 crossover_rate = 0.7
-number_selected_individuals = population_size//2
-number_generations = 30
+number_selected_individuals = population_size // 4
+number_generations = 40
 image_dict = load_images(DATA)
 
+# ----------------------------------------------------------------------------------------------------------
+## read the images
+ct_image = cv2.imread(ct_image_path)
+pet_image = cv2.imread(pet_image_path)
 
 # ----------------------------------------------------------------------------------------------------------
 ## final algorithm
-def genetic_algorithm(image_dict, maximizing_fitness_function, population_size, number_selected_individuals, number_generations, selection_type="tournament", minimize=False):
-    sorted_dict = dict(sorted(image_dict.items(), key=lambda item: int(item[0][1:])))
-
-    # iterate over patients folders
-    for patient_folder in sorted_dict:
-        images = image_dict[patient_folder]
-        # extract ct- and pet-images for each patient
-        ct_image = images['ct']
-        pet_image = images['pet']
-
-        patient_dir = create_output_dirs(OUTPUT, patient_folder)
-
-        population = initialize_population(population_size)
-        population_matrix = population[0]
-        gray_coded_population = population[2]
-
-        selected_individuals = test_fitness_and_select(ct_image, pet_image, maximizing_fitness_function, population_matrix, gray_coded_population, number_selected_individuals, selection_type, minimize=False)
-
-        fitness_values = selected_individuals[0]
-        best_individuals_matrix = selected_individuals[1]
-        best_coded_individuals = selected_individuals[2]
-
-        #print(f"best fitness-values for {patient_folder}: {fitness_values}")
-        #print(f"best individual as matrix for {patient_folder}: {best_individuals_matrix}")
-        #print(f"beste individual as gray-code for {patient_folder}: {best_coded_individuals}")
-
-        for generation in range(number_generations):
-            selected_individuals = test_fitness_and_select(ct_image, pet_image, maximizing_fitness_function, population_matrix, gray_coded_population, number_selected_individuals, selection_type, minimize=False)
-
-            fitness_values = selected_individuals[0]
-            best_individuals_matrix = selected_individuals[1]
-            best_coded_individuals = selected_individuals[2]
-
-            best_individual = best_individuals_matrix[0]  # Annahme: Das erste Individuum ist das beste
-            transformed_pet_image = apply_transformations(pet_image, best_individual)
-
-            # Erzeuge die nächste Generation
-            new_generation = next_generation(best_individuals_matrix, best_coded_individuals, crossover_rate,
-                                             mutation_rate)
-            new_generation_matrix = new_generation[0]
-            new_generation_coded = new_generation[1]
-            population_matrix = new_generation_matrix
-            gray_coded_population = new_generation_coded
+average_fitness_all_generations = process_images_and_run_algorithm(image_dict, OUTPUT, NCC, population_size, number_selected_individuals,
+                                 number_generations, crossover_rate, mutation_rate, selection_type="rankbased", minimize=False)
 
 
-            overlaid_image = cv2.addWeighted(ct_image, 0.5, transformed_pet_image, 0.5, 0)
-            save_images(patient_dir, overlaid_image, generation_count=generation)
-            cv2.imshow('Overlaid Image', overlaid_image)
-            cv2.waitKey(1)  # Warte kurz zwischen den Bildern, 1 ms
+#genetic_algorithm(ct_image, pet_image,  NCC, population_size, number_selected_individuals, number_generations, crossover_rate,
+#                  mutation_rate, selection_type="rankbased", minimize=False)
 
-            #print(f"generation {generation + 1} - best fitness-values for {patient_folder}: {fitness_values}")
+# visualize
+# fitness score evolution per patient: line for every patient
+plot_patient_fitness_generations(average_fitness_all_generations)
+# total fitness score evolution: line for all patients (average)
+plot_total_average_fitness_generations(average_fitness_all_generations)
 
-genetic_algorithm(image_dict, NCC, population_size, number_selected_individuals, number_generations, selection_type="tournament", minimize=False)
 
+#population = initialize_population(population_size=20)
+#pop_matrix = population[0]
+#pop_gray_code = population[2]
+
+#test_fitness_and_select(ct_image, pet_image, NCC, pop_matrix, pop_gray_code, number_selected_individuals=10, selection_type="roulette", minimize=False)

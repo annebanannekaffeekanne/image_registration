@@ -49,20 +49,26 @@ def sigma(_image):
 # to be maximized
 def MI(ct_image, pet_image):
     MI = H_I(ct_image) + H_I(pet_image) - H_I_J(ct_image, pet_image)
+    #print(f"mutual information: {MI}")
     return MI
 
 # normalized mutual information
 # to be maximized
 def NMI(ct_image, pet_image):
     NMI = 2 * MI(ct_image, pet_image)/(H_I(ct_image) + H_I(pet_image))
+    #print(f"normalized mutual information: {NMI}")
     return NMI
 
 # sum of squared differences
 # to be minimized
 def SSD(ct_image, pet_image):
     if ct_image.shape == pet_image.shape:
+        ct_image = ct_image.astype(np.uint8)
+        pet_image = pet_image.astype(np.uint8)
+
         SD = np.square(ct_image - pet_image)
         SSD = np.sum(SD)
+        #print(f"sum of squared differences: {SSD}")
         return SSD
     else:
         raise ValueError("the images are not having the same size.")
@@ -74,6 +80,7 @@ def NCC(ct_image, pet_image):
         mu_I, mu_J = mu(ct_image), mu(pet_image)
         sigma_I, sigma_J = sigma(ct_image), sigma(pet_image)
         NCC = np.sum(((ct_image - mu_I) * (pet_image - mu_J))/(ct_image.size * sigma_I * sigma_J))
+        #print(f"normalized cross correlation: {NCC}")
         return NCC
     else:
         raise ValueError("the images are not having the same size.")

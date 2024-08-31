@@ -5,7 +5,7 @@ import random
 import numpy as np
 from .transformation_methods import *
 from .preprocessing_methods import *
-
+from algorithm_code._1_coding_decoding import transformation_matrix
 # --------------------------------------------------------------------------------------------------
 ## load images as dictionaries
 def load_images(dir_path):
@@ -54,7 +54,7 @@ def load_images(dir_path):
 
 # ---------------------------------------------------------------------------------------------------
 # preprocess the images
-def preprocess_images(src_dir, dest_dir):
+def preprocess_images(src_dir, dest_dir, preprocess_method):
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
 
@@ -70,13 +70,15 @@ def preprocess_images(src_dir, dest_dir):
         ct_image = images['ct']
 
         try:
-            preprocessed_pet_image = preprocess_image(pet_image, is_pet_image=True)
+        # adapt function for fitness function
+            preprocessed_pet_image = preprocess_method(pet_image, is_pet_image=False)
 
             preprocessed_pet_image_path = os.path.join(patient_path, 'pet_image.png')
 
             cv2.imwrite(preprocessed_pet_image_path, preprocessed_pet_image)
+        # adapt function for fitness function
+            preprocessed_ct_image = preprocess_method(ct_image, is_pet_image=False)
 
-            preprocessed_ct_image = preprocess_image(ct_image, is_pet_image=False)
             preprocessed_ct_image_path = os.path.join(patient_path, 'ct_image.png')
             cv2.imwrite(preprocessed_ct_image_path, preprocessed_ct_image)
 
@@ -90,8 +92,9 @@ def preprocess_images(src_dir, dest_dir):
     print(" ")
 
 # -------------------------------------------------------------------------------------------------
+
 # apply artificial transformation on pet image to make it more complex
-def transform_images(src_dir, dest_dir, transformations):
+def transform_images(src_dir, dest_dir):
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
 
@@ -106,7 +109,9 @@ def transform_images(src_dir, dest_dir, transformations):
         ct_image = images['ct']
 
         try:
-            transformed_image = apply_transformations(pet_image, transformations)
+            transformation_matrix = random_transformation(patient_folder)
+
+            transformed_image = apply_transformations(pet_image, transformation_matrix)
 
             transformed_image_path = os.path.join(patient_path, 'pet_image.png')
             cv2.imwrite(transformed_image_path, transformed_image)
@@ -124,17 +129,31 @@ def transform_images(src_dir, dest_dir, transformations):
     print(" ")
 
 # -------------------------------------------------------------------------------------------------
-# exemplary use of the methods
-#transformations = {
-#    'translate': (random.randint(-20, 20), random.randint(-20, 20)),
-#    'scale': (random.uniform(0.9, 1.5), random.uniform(0.9, 1.5)),
-#    'rotate': random.uniform(-30, 30),
-#    'shear': (random.uniform(-0.5, 0.5), random.uniform(-0.5, 0.5))}
 
-#load_images('/Users/anne/PycharmProjects/genetic_algorithm/data/raw_data')
-#preprocess_images('/Users/anne/PycharmProjects/genetic_algorithm/data/raw_data', '/Users/anne/PycharmProjects/genetic_algorithm/data/preprocessed_data')
-#transform_images('/Users/anne/PycharmProjects/genetic_algorithm/data/preprocessed_data', '/Users/anne/PycharmProjects/genetic_algorithm/data/transformed_data', transformations)
+def overlay_images(src_dir, dest_dir):
+    if not os.path.exists(dest_dir):
+        os.makedirs(dest_dir)
 
+    images_dict = load_images(src_dir)
 
+    for patient_folder, images in images_dict.items():
+        patient_path = os.path.join(dest_dir, patient_folder)
+        if not os.path.exists(patient_path):
+            os.makedirs(patient_path)
 
+        pet_image = images['pet']
+        ct_image = images['ct']
 
+        if pet_image is None or ct_image is None:
+            print(f"Error: Missing images for patient {patient_folder}")
+            continue
+        if pet_image.shape != ct_image.shape:
+            print(f"Error: Image sizes do not match for patient {patient_folder}")
+            continue
+
+        overlaid_image = cv2.addWeighted(ct_image, 0.5, pet_image, 0.5, 0)
+
+        image_path = os.path.join(patient_path, 'overlaid_preprocessed_image.png')
+        cv2.imwrite(image_path, overlaid_image)
+
+        print(f"Overlay created and saved for patient {patient_folder} at {image_path}")

@@ -1,7 +1,7 @@
 ## import necessary libraries
 import random
 import numpy as np
-from ._3_initialize_population import initialize_population
+
 # --------------------------------------------------------------------------------------------------------------
 ## fitnessproportional selection methods
 # roulette selection
@@ -14,6 +14,9 @@ def roulette_selection(population_matrix, population_coded, fitness_scores, numb
 
     selected_individuals_matrix = [population_matrix[i] for i in selected_indices]
     selected_individuals_bitstrings = [population_coded[i] for i in selected_indices]
+
+    #for i in selected_indices:
+        #print(f"Selected individual index: {i}, Fitness score: {fitness_scores[i]}")
 
     # debug
     #print(f"selected individuals with roulette selection (matrices): {selected_individuals_matrix}")
@@ -42,8 +45,13 @@ def SUS_selection(population_matrix, gray_coded_population, fitness_scores, numb
             sum_fitness += fitness_scores[i]
             i += 1
         selected_individuals.append(i-1)
+
+    selected_individuals = list(set(selected_individuals))
     selected_individuals_matrix = [population_matrix[i] for i in selected_individuals]
     selected_individuals_bitstrings = [gray_coded_population[i] for i in selected_individuals]
+
+    #for i in selected_individuals:
+        #print(f"SUS selected individual index: {i}, Fitness score: {fitness_scores[i]}")
 
     # debug
     #print(f"selected individuals with SUS-selection (matrices): {selected_individuals_matrix}")
@@ -62,9 +70,12 @@ def rankbased_selection(population_matrix, gray_coded_population, fitness_scores
     ranks = np.arange(1, len(sorted_population) + 1)
     selection_p = ranks / ranks.sum()
 
-    chosen_fitness_scores = np.random.choice(len(sorted_population), size=number_selected_individuals, p=selection_p)
+    chosen_fitness_scores = np.random.choice(len(sorted_population), size=number_selected_individuals, p=selection_p, replace=False)
     selected_individuals_matrix = [sorted_population[i] for i in chosen_fitness_scores]
     selected_individuals_bitstrings = [sorted_coded_population[i] for i in chosen_fitness_scores]
+
+    #for i in chosen_fitness_scores:
+        #print(f"Rank-Based selected individual index: {sorted_fitness_scores[i]}, Fitness score: {fitness_scores[sorted_fitness_scores[i]]}")
 
     # debug
     #print(f"selected individuals with rank-based selection (matrices): {selected_individuals_matrix}")
@@ -77,13 +88,19 @@ def rankbased_selection(population_matrix, gray_coded_population, fitness_scores
 ## tournament selection method
 def tournament_selection(population_matrix, gray_coded_population, fitness_scores, number_selected_individuals, tournament_size=3):
     selected_individuals = []
+    remaining_individuals = list(range(len(population_matrix)))
+
     for i in range(number_selected_individuals):
-        tournament = random.sample(range(len(population_matrix)), tournament_size)
+        tournament = random.sample(remaining_individuals, tournament_size)
         winner = max(tournament, key=lambda i: fitness_scores[i])
         selected_individuals.append(winner)
+        remaining_individuals.remove(winner)
 
     selected_individuals_matrix = [population_matrix[i] for i in selected_individuals]
     selected_individuals_bitstrings = [gray_coded_population[i] for i in selected_individuals]
+
+    #for i in selected_individuals:
+        #print(f"Tournament selected individual index: {i}, Fitness score: {fitness_scores[i]}")
 
     # debug
     #print(f"selected individuals with tournament selection (matrices): {selected_individuals_matrix}")
