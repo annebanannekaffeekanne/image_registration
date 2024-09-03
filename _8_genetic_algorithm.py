@@ -1,17 +1,16 @@
-# import necessary libraries and methods
+## import necessary libraries and methods
+from ._1_coding_decoding import apply_transformations
 from ._3_initialize_population import initialize_population
 from ._5_test_fitness_and_selection import test_fitness_and_select
+from ._6_crossover_mutation import single_point_crossover, two_point_crossover, uniform_crossover
 from ._7_create_next_generation import next_generation
-from visualization_code.visualization_methods import save_images, create_output_dirs
-from data_processing_code.transformation_methods import apply_transformations
+from data_processing_code.process_images import save_registered_images, create_output_dirs
 import cv2
-import numpy as np
 
-# ----------------------------------------------------------------------------------------------------------------------
+# ===================================================================================================================
 # genetic algorithm itself
 def genetic_algorithm(ct_image, pet_image, maximizing_fitness_function, population_size, number_selected_individuals,
-                      number_generations, crossover_rate, mutation_rate, selection_type="tournament", minimize=False):
-
+                      number_generations, crossover_rate, mutation_rate, selection_method, crossover_method, minimize=False):
     # apply method to initialize a population
     population = initialize_population(population_size)
     # divide into population as matrices and as coded bitstrings (method returns different populations)
@@ -24,12 +23,10 @@ def genetic_algorithm(ct_image, pet_image, maximizing_fitness_function, populati
 
     # iterate over the generations
     for generation in range(number_generations):
-        #print(50 * "-")
-        #rint(f"generation: {generation}:")
-
         # apply method to test fitness and select the best individuals of each generation
-        selected_individuals = test_fitness_and_select(ct_image, pet_image, maximizing_fitness_function, population_matrix,
-                                                       gray_coded_population, number_selected_individuals, selection_type, minimize)
+        selected_individuals = test_fitness_and_select(ct_image, pet_image, maximizing_fitness_function,
+                                                       population_matrix,gray_coded_population,
+                                                       number_selected_individuals, selection_method, minimize)
 
         # divide the returns of the method into variables
         fitness_values = selected_individuals[0]
@@ -42,7 +39,8 @@ def genetic_algorithm(ct_image, pet_image, maximizing_fitness_function, populati
         transformed_pet_image = apply_transformations(pet_image, best_individual)
 
         # apply method to create the next generation
-        new_generation = next_generation(best_individuals_matrix, best_coded_individuals, crossover_rate, mutation_rate)
+        new_generation = next_generation(best_individuals_matrix, best_coded_individuals,
+                                         crossover_rate, mutation_rate, crossover_method)
         # divide the returns to have the next generation as matrices and bitstrings
         population_matrix = new_generation[0]
         gray_coded_population = new_generation[1]
@@ -54,10 +52,10 @@ def genetic_algorithm(ct_image, pet_image, maximizing_fitness_function, populati
         average_fitness = sum(fitness_values) / len(fitness_values)
         average_fitness_per_generation.append(average_fitness)
 
-        average_fitness_first_gen = average_fitness_per_generation[0]
-        average_fitness_last_gen = average_fitness_per_generation[-1]
+        #average_fitness_first_gen = average_fitness_per_generation[0]
+        #average_fitness_last_gen = average_fitness_per_generation[-1]
         # visualize the progress of image-change over the generations
-        cv2.imshow(f'overlaid image -- generation {generation+1}', overlaid_image)
+        cv2.imshow(f'overlaid image for generation {generation+1}', overlaid_image)
         cv2.waitKey(1)
     cv2.destroyAllWindows()
 
@@ -66,12 +64,11 @@ def genetic_algorithm(ct_image, pet_image, maximizing_fitness_function, populati
 
     return population_matrix, gray_coded_population, overlaid_images, average_fitness_per_generation
 
-# ----------------------------------------------------------------------------------------------------------------------
+# ===================================================================================================================
 # apply genetic algorithm on a dict of images and save them
 def process_images_and_run_algorithm(image_dict, OUTPUT, maximizing_fitness_function, population_size,
                                      number_selected_individuals, number_generations, crossover_rate, mutation_rate,
-                                     selection_type="tournament", minimize=False):
-
+                                     selection_method, crossover_method, minimize=False):
     # sort the dictionary
     sorted_dict = dict(sorted(image_dict.items(), key=lambda item: int(item[0][1:])))
 
@@ -92,20 +89,20 @@ def process_images_and_run_algorithm(image_dict, OUTPUT, maximizing_fitness_func
         population_matrix, gray_coded_population, overlaid_images, average_fitness_per_generation = genetic_algorithm(
             ct_image, pet_image, maximizing_fitness_function, population_size,
             number_selected_individuals, number_generations, crossover_rate, mutation_rate,
-            selection_type, minimize)
+            selection_method, crossover_method, minimize)
 
         for generation, avg_fitness in enumerate(average_fitness_per_generation):
             average_fitness_all_generations[generation].append(avg_fitness)
 
         # save overlaid image for every generation of an image pair to visualize the registration progress
         for generation, overlaid_image in enumerate(overlaid_images):
-            save_images(patient_dir, overlaid_image, generation)
+            save_registered_images(patient_dir, overlaid_image, generation)
 
     for generation, fitness_list in enumerate(average_fitness_all_generations):
         overall_avg_fitness = sum(fitness_list) / len(fitness_list)
-        print(f"Average fitness for generation {generation + 1} across all patients: {overall_avg_fitness}")
+        print(f"average fitness for generation {generation + 1} across all patients: {overall_avg_fitness}")
 
-    print("Successfully applied genetic algorithm.")
+    print("successfully applied genetic algorithm.")
     return average_fitness_all_generations
 
 

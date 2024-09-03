@@ -1,27 +1,9 @@
 # import necessary libraries
-import os
-import cv2
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-# -----------------------------------------------------------------------------------------
-# create output directories for patient folders
-def create_output_dirs(base_dir, patient_folder):
-    patient_dir = os.path.join(base_dir, patient_folder)
-    if not os.path.exists(patient_dir):
-        os.makedirs(patient_dir)
-
-    return patient_dir
-
-# ------------------------------------------------------------------------------------------------------
-# save images for every generation
-def save_images(patient_dir, transformed_image, generation_count):
-    output_path = os.path.join(patient_dir, f'registered_image_gen_{generation_count}.png')
-    cv2.imwrite(output_path, transformed_image)
-
-
-# ------------------------------------------------------------------------------------------------------
+# ===================================================================================================================
 # create a lineplot for every patient
 def plot_patient_fitness_generations(average_fitness_all_generations):
     # create empty dataframe
@@ -51,7 +33,7 @@ def plot_patient_fitness_generations(average_fitness_all_generations):
     plt.tight_layout()
     plt.show()
 
-# ------------------------------------------------------------------------------------------------------
+# -------------------------------------------------------------------------------------------------------------------
 # create a lineplot of average fitness of all patients
 def plot_total_average_fitness_generations(average_fitness_all_generations):
     # number of patients

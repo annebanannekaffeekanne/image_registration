@@ -2,7 +2,7 @@
 import random
 import numpy as np
 
-# --------------------------------------------------------------------------------------------------------------
+# ===================================================================================================================
 ## fitnessproportional selection methods
 # roulette selection
 def roulette_selection(population_matrix, population_coded, fitness_scores, number_selected_individuals):
@@ -24,7 +24,7 @@ def roulette_selection(population_matrix, population_coded, fitness_scores, numb
 
     return selected_individuals_matrix, selected_individuals_bitstrings
 
-
+# -------------------------------------------------------------------------------------------------------------------
 # stochastic universal sampling
 def SUS_selection(population_matrix, gray_coded_population, fitness_scores, number_selected_individuals):
     total_fitness = sum(fitness_scores)
@@ -60,7 +60,7 @@ def SUS_selection(population_matrix, gray_coded_population, fitness_scores, numb
     return selected_individuals_matrix, selected_individuals_bitstrings
 
 
-# ------------------------------------------------------------------------------------------------------------
+# ===================================================================================================================
 ## rankbased selection methods
 def rankbased_selection(population_matrix, gray_coded_population, fitness_scores, number_selected_individuals):
     sorted_fitness_scores = np.argsort(fitness_scores)
@@ -75,7 +75,7 @@ def rankbased_selection(population_matrix, gray_coded_population, fitness_scores
     selected_individuals_bitstrings = [sorted_coded_population[i] for i in chosen_fitness_scores]
 
     #for i in chosen_fitness_scores:
-        #print(f"Rank-Based selected individual index: {sorted_fitness_scores[i]}, Fitness score: {fitness_scores[sorted_fitness_scores[i]]}")
+    #    print(f"rank-based selected individual index: {sorted_fitness_scores[i]}, Fitness score: {fitness_scores[sorted_fitness_scores[i]]}")
 
     # debug
     #print(f"selected individuals with rank-based selection (matrices): {selected_individuals_matrix}")
@@ -84,7 +84,7 @@ def rankbased_selection(population_matrix, gray_coded_population, fitness_scores
     return selected_individuals_matrix, selected_individuals_bitstrings
 
 
-# ------------------------------------------------------------------------------------------------------------
+# ===================================================================================================================
 ## tournament selection method
 def tournament_selection(population_matrix, gray_coded_population, fitness_scores, number_selected_individuals, tournament_size=3):
     selected_individuals = []

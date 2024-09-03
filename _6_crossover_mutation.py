@@ -1,9 +1,9 @@
-## import necessary libraries
+## import necessary library
 import random
 
-# ----------------------------------------------------------------------------------------------------------
+# ===================================================================================================================
 # crossover, parents only as bitstrings
-def crossover(parent1, parent2):
+def single_point_crossover(parent1, parent2):
     # choose a random point which is in the range of the bitstring length (parent-length)
     point = random.randint(1, len(parent1) - 1)
 
@@ -15,6 +15,44 @@ def crossover(parent1, parent2):
     child2 = parent2[:point] + parent1[point:]
     return child1, child2
 
+# -------------------------------------------------------------------------------------------------------------------
+def two_point_crossover(parent1, parent2):
+    if len(parent1) != len(parent2):
+        raise ValueError("Parents must have the same length.")
+
+    length = len(parent1)
+    point1 = random.randint(1, length - 1)
+    point2 = random.randint(1, length - 1)
+
+    if point1 > point2:
+        point1, point2 = point2, point1
+
+    child1 = parent1[:point1] + parent2[point1:point2] + parent1[point2:]
+    child2 = parent2[:point1] + parent1[point1:point2] + parent2[point2:]
+
+    return child1, child2
+
+# -------------------------------------------------------------------------------------------------------------------
+def uniform_crossover(parent1, parent2, crossover_rate=0.5):
+    if len(parent1) != len(parent2):
+        raise ValueError("Parents must have the same length.")
+
+    length = len(parent1)
+    child1 = []
+    child2 = []
+
+    for i in range(length):
+        if random.random() < crossover_rate:
+
+            child1.append(parent2[i])
+            child2.append(parent1[i])
+        else:
+            child1.append(parent1[i])
+            child2.append(parent2[i])
+
+    return ''.join(child1), ''.join(child2)
+
+# ===================================================================================================================
 # mutation
 def mutation(individual, mutation_rate):
     # new individual is the given individual

@@ -1,15 +1,14 @@
 # import necessary libraries and methods
 import random
 from ._1_coding_decoding import bitstring_to_matrix
-from ._6_crossover_mutation import crossover, mutation
+from ._6_crossover_mutation import single_point_crossover, two_point_crossover, uniform_crossover, mutation
 
-# ----------------------------------------------------------------------------------------------------------
+# ===================================================================================================================
 ## create the next generation
-def next_generation(best_individual_matrix, best_coded_individuals, crossover_rate, mutation_rate):
+def next_generation(best_individual_matrix, best_coded_individuals, crossover_rate, mutation_rate, crossover_method):
     # empty list for the generation as bitstrings
     next_generation_bitstrings = []
-
-    # select the number of parents which is the length of the chosen individuals (=return of method: test_fitness_and_select)
+    # select number of parents which is the length of the chosen individuals (=return of method: test_fitness_and_select)
     number_parents = len(best_individual_matrix)
     # make sure that number of parents remains odd
     if number_parents % 2 != 0:
@@ -26,7 +25,14 @@ def next_generation(best_individual_matrix, best_coded_individuals, crossover_ra
         # choose a random value; if it's smaller than the crossover rate
         if random.random() < crossover_rate:
             # apply the crossover method to create children
-            child1, child2 = crossover(parent1, parent2)
+            if crossover_method == 'single_point':
+                child1, child2 = single_point_crossover(parent1, parent2)
+            elif crossover_method == 'two_point':
+                child1, child2 = two_point_crossover(parent1, parent2)
+            elif crossover_method == 'uniform':
+                child1, child2 = uniform_crossover(parent1, parent2, crossover_rate)
+            else:
+                raise ValueError("Unbekannte Crossover-Methode.")
             #print(f"child1: {child1}; child2: {child2}")
 
             # and apply the mutation method on both of the children and add them to the list
@@ -46,6 +52,3 @@ def next_generation(best_individual_matrix, best_coded_individuals, crossover_ra
     #print(f"next generation as matrices: {next_generation_matrix}")
     #print(f"next generation as bitstrings: {next_generation_bitstrings}")
     return next_generation_matrix, next_generation_bitstrings
-
-# exemplary apply
-# next_generation(best_individuals_matrix, best_coded_individuals, crossover_rate, mutation_rate)

@@ -1,8 +1,7 @@
 ## import necessary libraries
 import numpy as np
-import matplotlib as plt
 
-# -----------------------------------------------------------------------------------------------
+# ===================================================================================================================
 ## auxiliary methods
 
 # normalized histogram/probability for every intensity value of an image
@@ -20,9 +19,11 @@ def H_I(_image):
     H = -np.sum(p * np.log2(p + 1e-10))
     return H
 
+# -------------------------------------------------------------------------------------------------------------------
 # normalized histogram/probability for the intensity values of two images
 def P_I_J(ct_image, pet_image):
-    hist_2d, _, _ = np.histogram2d(ct_image.flatten(), pet_image.flatten(), bins=256, range=[[0,256], [0,256]], density=True)
+    hist_2d, _, _ = np.histogram2d(ct_image.flatten(), pet_image.flatten(), bins=256,
+                                   range=[[0,256], [0,256]], density=True)
     return hist_2d
 
 # entropy H of two images I & J
@@ -32,6 +33,7 @@ def H_I_J(ct_image, pet_image):
     H = -np.sum(p * np.log2(p + 1e-10))
     return H
 
+# -------------------------------------------------------------------------------------------------------------------
 # mean-intensity of an image
 def mu(_image):
     mu = np.mean(_image.flatten())
@@ -42,7 +44,7 @@ def sigma(_image):
     sigma = np.std(_image.flatten())
     return sigma
 
-# ----------------------------------------------------------------------------------------------
+# ===================================================================================================================
 ## methods / fitness functions
 
 # mutual information
@@ -52,6 +54,7 @@ def MI(ct_image, pet_image):
     #print(f"mutual information: {MI}")
     return MI
 
+# -------------------------------------------------------------------------------------------------------------------
 # normalized mutual information
 # to be maximized
 def NMI(ct_image, pet_image):
@@ -59,6 +62,7 @@ def NMI(ct_image, pet_image):
     #print(f"normalized mutual information: {NMI}")
     return NMI
 
+# -------------------------------------------------------------------------------------------------------------------
 # sum of squared differences
 # to be minimized
 def SSD(ct_image, pet_image):
@@ -73,6 +77,7 @@ def SSD(ct_image, pet_image):
     else:
         raise ValueError("the images are not having the same size.")
 
+# -------------------------------------------------------------------------------------------------------------------
 # normalized cross correlation
 # to be maximized
 def NCC(ct_image, pet_image):
