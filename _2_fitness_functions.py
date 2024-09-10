@@ -89,3 +89,5 @@ def NCC(ct_image, pet_image):
         return NCC
     else:
         raise ValueError("the images are not having the same size.")
+
+

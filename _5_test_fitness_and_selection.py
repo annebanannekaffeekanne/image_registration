@@ -6,7 +6,6 @@ from ._4_selection_methods import roulette_selection, rankbased_selection, tourn
 def test_fitness_and_select(ct_image, pet_image, maximizing_fitness_function, population_matrix, gray_coded_population,
                             number_selected_individuals, selection_method, minimize=False):
     ## test fitness
-    # create empty list where the fitness values are saved
     fitness_values = []
     count = 0
 

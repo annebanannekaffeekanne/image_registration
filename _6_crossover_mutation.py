@@ -1,6 +1,6 @@
 ## import necessary library
 import random
-
+import numpy as np
 # ===================================================================================================================
 # crossover, parents only as bitstrings
 def single_point_crossover(parent1, parent2):
@@ -65,3 +65,20 @@ def mutation(individual, mutation_rate):
             new_individual[i] = '0' if new_individual[i] == '1' else '1'
     return ''.join(new_individual)
 
+# -------------------------------------------------------------------------------------------------------------------
+# different kind of mutation used in the adaptive radiation method
+def mutation_(individual, mutation_rate):
+    individual = np.array(individual)
+    new_individual = individual.copy()
+
+    for i in range(new_individual.size):
+        if random.random() < mutation_rate:
+            new_individual.flat[i] = 1 - new_individual.flat[i]
+
+    return new_individual
+
+# -------------------------------------------------------------------------------------------------------------------
+def adjust_mutation_rate(current_generation, max_generations, initial_rate=0.1, final_rate=0.01):
+    decay_factor = (final_rate - initial_rate) / max_generations
+    new_rate = initial_rate + decay_factor * current_generation
+    return max(final_rate, new_rate)

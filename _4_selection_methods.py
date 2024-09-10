@@ -91,7 +91,12 @@ def tournament_selection(population_matrix, gray_coded_population, fitness_score
     remaining_individuals = list(range(len(population_matrix)))
 
     for i in range(number_selected_individuals):
-        tournament = random.sample(remaining_individuals, tournament_size)
+        current_tournament_size = min(tournament_size, len(remaining_individuals))
+
+        # Wenn keine Individuen mehr verbleiben, breche die Schleife ab
+        if current_tournament_size <= 0:
+            break
+        tournament = random.sample(remaining_individuals, current_tournament_size)
         winner = max(tournament, key=lambda i: fitness_scores[i])
         selected_individuals.append(winner)
         remaining_individuals.remove(winner)
@@ -109,3 +114,8 @@ def tournament_selection(population_matrix, gray_coded_population, fitness_score
     return selected_individuals_matrix, selected_individuals_bitstrings
 
 
+def adjust_selection_size(current_generation, max_generations, initial_size, final_size):
+    # Linear decay of selection size
+    decay_factor = (final_size - initial_size) / max_generations
+    new_size = int(initial_size + decay_factor * current_generation)
+    return max(final_size, new_size)  # Ensure it doesn't go below final_size

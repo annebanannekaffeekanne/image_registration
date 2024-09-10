@@ -7,9 +7,9 @@ from ._1_coding_decoding import transformation_matrix, individual_to_bitstring, 
 # initialize random transformations to create a population
 def random_transformation(individual):
     tx, ty = random.randint(-20, 20), random.randint(-20, 20)
-    sx, sy = random.uniform(0.95, 1.10), random.uniform(0.95, 1.10)
-    a = random.uniform(-15, 15)
-    shx, shy = random.uniform(-0.01, 0.01), random.uniform(-0.01, 0.01)
+    sx, sy = random.uniform(0.99, 1.05), random.uniform(0.99, 1.05)
+    a = random.uniform(-3, 3)
+    shx, shy = random.uniform(-0.005, 0.005), random.uniform(-0.005, 0.005)
     return transformation_matrix(tx, ty, sx, sy, a, shx, shy)
 
 # -------------------------------------------------------------------------------------------------------------------
